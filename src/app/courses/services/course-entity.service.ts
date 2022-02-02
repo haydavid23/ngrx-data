@@ -6,8 +6,12 @@ import { Course } from "../model/course";
 @Injectable()
 export class CourseEntityService extends EntityCollectionServiceBase<Course>
 {
+    
     constructor(serviceElementsFactory:EntityCollectionServiceElementsFactory)
     {
         super("Course", serviceElementsFactory )
     }
+
+
+    
 }
