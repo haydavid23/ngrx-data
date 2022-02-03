@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Course} from '../model/course';
-import {Observable, of} from 'rxjs';
+import {Observable, of, pipe} from 'rxjs';
 import {Lesson} from '../model/lesson';
 import {concatMap, delay, filter, first, map, shareReplay, tap, withLatestFrom} from 'rxjs/operators';
 import {CoursesHttpService} from '../services/courses-http.service';
@@ -38,15 +38,29 @@ export class CourseComponent implements OnInit {
 
     this.course$ = this.coursesService.entities$.pipe(map((courses)=>{ return courses.find((course)=>{return course.url == courseUrl})}));
 
-    // this.course$ = this.coursesService.findCourseByUrl(courseUrl);
 
-    this.lessons$ = of([])
+    this.lessons$ = this.lessonService.entities$.pipe(
+      withLatestFrom(this.course$),
+      tap(([lessons, course])=>{
+        if(this.nextPage == 0)
+        {
+          this.loadLessonsPage(course)
+
+        }
+    }), map(([lessons, course])=>{return lessons}))
 
   }
 
 
-  loadLessonsPage(course: Course) {
+  loadLessonsPage(course: Course) 
+  {
+    this.lessonService.getWithQuery({
+      "CourseId": course.id.toString(),
+      "pageNumber":this.nextPage.toString(),
+      "pageSize":"3"
+    })
 
+    this.nextPage +=1;
   }
 
 }
