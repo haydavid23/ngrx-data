@@ -42,20 +42,22 @@ export class CourseComponent implements OnInit {
     this.lessons$ = this.lessonService.entities$.pipe(
       withLatestFrom(this.course$),
       tap(([lessons, course])=>{
+        console.log(this.nextPage)
         if(this.nextPage == 0)
         {
           this.loadLessonsPage(course)
 
         }
-    }), map(([lessons, course])=>{return lessons}))
+    }), map(([lessons, course])=>{return lessons.filter((lesson)=>{return lesson.courseId == course.id})}))
 
   }
 
 
   loadLessonsPage(course: Course) 
   {
+    console.log(course)
     this.lessonService.getWithQuery({
-      "CourseId": course.id.toString(),
+      "courseId": course.id.toString(),
       "pageNumber":this.nextPage.toString(),
       "pageSize":"3"
     })
